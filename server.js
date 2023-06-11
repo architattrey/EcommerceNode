@@ -13,7 +13,7 @@ app.listen(PORT, ()=>{
     console.log(`Server runnig at PORT" ${PORT}`);
 });
 
-app.use('api/user', authRouter);
+app.use('/api/user', authRouter);
 
 // app.use('/', (req, res)=>{
 //     res.send('server running.');
