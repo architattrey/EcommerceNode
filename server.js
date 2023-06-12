@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const dbConnect = require('./config/db');
 const authRouter = require('./routes/authRoute');
+const {notFound, errorHandler} = require('./middlewares/errorHandler');
 const app = express();
 const dotenv = require('dotenv').config();
 const PORT = process.env.PORT || 4000; // port is runing from .env file 
@@ -14,6 +15,8 @@ app.listen(PORT, ()=>{
 });
 
 app.use('/api/user', authRouter);
+app.use(notFound);
+app.request(errorHandler);
 
 // app.use('/', (req, res)=>{
 //     res.send('server running.');

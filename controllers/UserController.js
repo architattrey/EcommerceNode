@@ -1,7 +1,8 @@
 const User = require('../models/User');
+const asyncHandler = require('express-async-handler');
 
 
-const createUser = async (req, res) => {
+const createUser = asyncHandler( async (req, res) => {
 
     const email = req.body.email;
     // check the mail id is in body or not
@@ -31,6 +32,5 @@ const createUser = async (req, res) => {
             code:200
         });
     }     
-}
-
+});
 module.exports = {createUser};
