@@ -16,7 +16,7 @@ app.listen(PORT, ()=>{
 
 app.use('/api/user', authRouter);
 app.use(notFound);
-app.request(errorHandler);
+app.use(errorHandler);
 
 // app.use('/', (req, res)=>{
 //     res.send('server running.');
