@@ -37,7 +37,7 @@ userSchema.pre("save", async function (next){
 });
 //compare the user password .. will return false and true
 userSchema.methods.isPasswordMatched = async function(enteredPassword){
-    return await bycrypt.compare(enteredPassword, this.password);
+    return await bcrypt.compare(enteredPassword, this.password);
 }
 //Export the model
 module.exports = mongoose.model('User', userSchema); 

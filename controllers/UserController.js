@@ -6,6 +6,7 @@ const createUser = asyncHandler( async (req, res) => {
 
     const email = req.body.email;
     // check the mail id is in body or not
+
     if(email){
         const findUser = await User.findOne({email:email}); // find user by email
 
@@ -15,20 +16,20 @@ const createUser = asyncHandler( async (req, res) => {
             res.json({
                 data:createNewUser,
                 message:"User Created Successfully.",
-                success:true,
+                status:'success',
                 code:200
             });
         }else{
             res.json({
                 message:"User Already Exist",
-                success:false,
+                status:'failed',
                 code:200
             });
         }
     }else{
         res.json({
             message:"Please provide the email id",
-            success: false,
+            status:'failed',
             code:200
         });
     }     
@@ -36,7 +37,28 @@ const createUser = asyncHandler( async (req, res) => {
 // to login the user
 const loginUser = asyncHandler( async (req, res) => {
     const {email, password} = req.body;
-    console.log(email, password);
+    const findUser = await User.findOne({ email });
+
+    if(findUser){
+        // check the password
+        if(await findUser.isPasswordMatched(password)){
+            res.status(200).json({
+                status:'success', 
+                code:"200", 
+                'data': findUser
+            });
+        }
+        res.status(401).json({ 
+            status: "failed", 
+            code:"401",
+            error: 'Invalid credentials' 
+        }); 
+    }
+    res.status(404).json({ 
+        status: "failed", 
+        code:"401", 
+        error: 'User Not found' 
+    }); 
 }); 
 
 module.exports = {createUser, loginUser};
