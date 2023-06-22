@@ -31,7 +31,9 @@ var userSchema = new mongoose.Schema({
 
 // password hashing
 userSchema.pre("save", async function (next){
-    const salt = bcrypt.genSaltSync(saltRounds);
+    const saltRounds = 10
+    const salt = await bcrypt.genSaltSync(saltRounds);
+    this.password = await bcrypt.hash(this.password, salt);
 });
 //Export the model
-module.exports = mongoose.model('User', userSchema);
+module.exports = mongoose.model('User', userSchema); 

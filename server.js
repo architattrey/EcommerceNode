@@ -18,7 +18,7 @@ app.use('/api/user', authRouter);
 app.use(notFound);
 app.use(errorHandler);
 
-// app.use('/', (req, res)=>{
+// app.use('/', (req, res)=>{ 
 //     res.send('server running.');
 // });
 // // module.exports = app;
