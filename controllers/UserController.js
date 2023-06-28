@@ -1,3 +1,4 @@
+const { generateToken } = require('../config/jwtToken');
 const User = require('../models/User');
 const asyncHandler = require('express-async-handler');
 
@@ -45,7 +46,13 @@ const loginUser = asyncHandler( async (req, res) => {
             res.status(200).json({
                 status:'success', 
                 code:"200", 
-                'data': findUser
+                data: {
+                    'email':findUser?.email,
+                    'mobile':findUser?.mobile,
+                    'firstname':findUser?.first_name,
+                    'lastname':findUser?.last_name,
+                    'token': generateToken(findUser?._id)
+                }
             });
         }
         res.status(401).json({ 
