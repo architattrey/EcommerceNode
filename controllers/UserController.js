@@ -40,7 +40,7 @@ const loginUser = asyncHandler( async (req, res) => {
     const findUser = await User.findOne({ email });
 
     if(findUser){
-        // check the password
+        // check the password from user schema
         if(await findUser.isPasswordMatched(password)){
             res.status(200).json({
                 status:'success', 
