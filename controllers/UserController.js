@@ -50,6 +50,7 @@ const loginUser = asyncHandler( async (req, res) => {
                     status:'success', 
                     code:"200", 
                     data: {
+                        'id':findUser?._id,
                         'email':findUser?.email,
                         'mobile':findUser?.mobile,
                         'firstname':findUser?.first_name,
@@ -161,24 +162,42 @@ const updateUser = asyncHandler(async (req, res) => {
     try {
         if (req.params) {
             const { id } = req.params;
-            const updateData = req.body; // Assuming the updated data is sent in the request body
-  
-            const updatedUser = await User.findByIdAndUpdate(id, updateData, {
-                new: true, // To get the updated user object as the result
-            });
-  
-            if (updatedUser) {
-                return res.status(200).json({
-                    status: "success",
-                    code: 200,
-                    data: updatedUser,
-                });
-            } 
-            return res.status(500).json({
-                status: "failed",
-                code: 500,
-                error: 'Something went wrong. Please try again.',
-            });
+            //const updateData = req.body; // Assuming the updated data is sent in the request body
+            const user = await User.findById(id);
+            console.log(user);
+            console.log(req.body);
+            if(user){
+                const updatedUser = await User.findByIdAndUpdate(id, 
+                    {
+                        first_name:req.body.first_name,
+                        last_name:req.body.last_name,
+                        email:req.body.email,
+                        mobile:req.body.mobile,
+                    }, 
+                    {
+                        new: true, // To get the updated user object as the result
+                    }
+                );
+      
+                if (updatedUser) {
+                    return res.status(201).json({
+                        status: "success",
+                        code: 201,
+                        data: updatedUser,
+                    });
+                } 
+                return res.status(500).json({
+                    status: "failed",
+                    code: 500,
+                    error: 'Something went wrong. Please try again.',
+                });  
+            }
+            return res.status(404).json({ 
+                status: "failed", 
+                code:"404", 
+                error: 'User Not found' 
+            });  
+           
     
         }
         return res.status(400).json({

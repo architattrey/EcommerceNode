@@ -31,7 +31,17 @@ var userSchema = new mongoose.Schema({
         type:String,
         default:"user"
     },
-});
+    cart:{
+        type:Array,
+        default:[],
+    },
+    address:[{ type: mongoose.Schema.Types.ObjectId, ref:"Address"}],
+    wishlist:[{type: mongoose.Schema.Types.ObjectId, ref:"Product"}],
+},
+{
+    timestamps:true,
+}
+);
 
 // password hashing
 userSchema.pre("save", async function (next){
@@ -41,7 +51,7 @@ userSchema.pre("save", async function (next){
 });
 //compare the user password .. will return false and true
 userSchema.methods.isPasswordMatched = async function(enteredPassword){
-    return await bcrypt.compare(enteredPassword, this.password);
+    return await bcrypt.compare(enteredPassword, this.password); 
 }
 //Export the model
 module.exports = mongoose.model('User', userSchema);
