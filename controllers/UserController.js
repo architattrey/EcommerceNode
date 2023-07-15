@@ -161,11 +161,10 @@ const deleteUser = asyncHandler (async(req, res) =>{
 const updateUser = asyncHandler(async (req, res) => {
     try {
         if (req.params) {
-            const { id } = req.params;
-            //const updateData = req.body; // Assuming the updated data is sent in the request body
+            
+            const {id} = req.user;
             const user = await User.findById(id);
-            console.log(user);
-            console.log(req.body);
+
             if(user){
                 const updatedUser = await User.findByIdAndUpdate(id, 
                     {
@@ -196,9 +195,7 @@ const updateUser = asyncHandler(async (req, res) => {
                 status: "failed", 
                 code:"404", 
                 error: 'User Not found' 
-            });  
-           
-    
+            });
         }
         return res.status(400).json({
             status: "failed",
@@ -210,12 +207,83 @@ const updateUser = asyncHandler(async (req, res) => {
       throw new Error(error);
     }
 });
-  
+// block the user
+const blockUser = asyncHandler(async (req, res) => {
+    const {id} = req.user;
+    const user = await User.findById(id);
+
+    if(user){
+        const block = await User.findByIdAndUpdate(id, 
+            {
+                isBlocked:true,    
+            }, 
+            {
+                new: true, // To get the updated user object as the result
+            }
+        );
+
+        if (block) {
+            return res.status(201).json({
+                status: "success",
+                code: 201,
+                message: "User Sucessfully blocked.",
+            });
+        } 
+        return res.status(500).json({
+            status: "failed",
+            code: 500,
+            error: 'Something went wrong. Please try again.',
+        });  
+    }
+    return res.status(404).json({ 
+        status: "failed", 
+        code:"404", 
+        error: 'User Not found' 
+    });
+});
+
+// ublock the user
+const unblockUser = asyncHandler(async (req, res)=>{
+    const {id} = req.user;
+    const user = await User.findById(id);
+
+    if(user){
+        const unblock = await User.findByIdAndUpdate(id, 
+            {
+                isBlocked:false,    
+            }, 
+            {
+                new: true, // To get the updated user object as the result
+            }
+        );
+
+        if (unblock) {
+            return res.status(201).json({
+                status: "success",
+                code: 201,
+                message: "User Successfully unblocked.",
+            });
+        } 
+        return res.status(500).json({
+            status: "failed",
+            code: 500,
+            error: 'Something went wrong. Please try again.',
+        });  
+    }
+    return res.status(404).json({ 
+        status: "failed", 
+        code:"404", 
+        error: 'User Not found' 
+    });
+
+});
 module.exports = {
     createUser,
     loginUser,
     users,
     user, 
     deleteUser,
-    updateUser
+    updateUser,
+    blockUser,
+    unblockUser,
 };
