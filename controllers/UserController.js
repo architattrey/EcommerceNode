@@ -1,6 +1,7 @@
 const { generateToken } = require('../config/jwtToken');
 const User = require('../models/User');
 const asyncHandler = require('express-async-handler');
+const validateMongodbId = require('../utils/validateMongodbId')
 
 
 const createUser = asyncHandler( async (req, res) => {
@@ -101,6 +102,7 @@ const user = asyncHandler( async(req, res) => {
     try{
         if(req.params){
             const id = req.params.id;
+            validateMongodbId(id);
             const user = await User.findById(id);
             if(user){
                 res.status(200).json({
