@@ -29,11 +29,14 @@ var userSchema = new mongoose.Schema({
     },
     role:{
         type:String,
-        default:"user"
+        default:"user",
     },
     isBlocked:{
         type:Boolean,
-        default:false
+        default:false,
+    },
+    referesh_token:{
+        type:String,
     },
     cart:{
         type:Array,

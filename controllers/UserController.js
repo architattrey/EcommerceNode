@@ -1,7 +1,9 @@
 const { generateToken } = require('../config/jwtToken');
 const User = require('../models/User');
 const asyncHandler = require('express-async-handler');
-const validateMongodbId = require('../utils/validateMongodbId')
+const validateMongodbId = require('../utils/validateMongodbId');
+const { generateRefereshToken } = require('../config/refereshToken');
+
 
 
 const createUser = asyncHandler( async (req, res) => {
@@ -47,6 +49,18 @@ const loginUser = asyncHandler( async (req, res) => {
         if(findUser){
             // check the password from user schema
             if(await findUser.isPasswordMatched(password)){
+                // generate the fresh token using referesh token js file then will update in user table
+              
+                const newToken = await generateRefereshToken(findUser?._id);
+               
+                await User.findByIdAndUpdate(findUser._id, {
+                    referesh_token:newToken,
+                }, {new:true});
+                //  set the cookie for token with help of cookie parser module
+                res.cookie('referesh_token', newToken, {
+                    httpOnly: true,
+                    maxAge: 72 * 60 * 60 * 1000,
+                });
                 res.status(200).json({
                     status:'success', 
                     code:"200", 
@@ -140,8 +154,7 @@ const deleteUser = asyncHandler (async(req, res) =>{
                     status:"success",
                     code:200,
                     message:'user successfully deleted.'
-                }); 
-                
+                });  
             }
             return res.status(404).json({ 
                 status: "failed", 
