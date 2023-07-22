@@ -35,7 +35,7 @@ var userSchema = new mongoose.Schema({
         type:Boolean,
         default:false,
     },
-    referesh_token:{
+    refresh_token:{
         type:String,
     },
     cart:{

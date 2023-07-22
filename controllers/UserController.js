@@ -55,10 +55,10 @@ const loginUser = asyncHandler( async (req, res) => {
                 const newToken = await generateRefereshToken(findUser?._id);
                
                 await User.findByIdAndUpdate(findUser._id, {
-                    referesh_token:newToken,
+                    refresh_token:newToken,
                 }, {new:true});
                 //  set the cookie for token with help of cookie parser module
-                res.cookie('referesh_token', newToken, {
+                res.cookie('refresh_token', newToken, {
                     httpOnly: true,
                     maxAge: 72 * 60 * 60 * 1000,
                 });
@@ -293,16 +293,15 @@ const unblockUser = asyncHandler(async (req, res)=>{
 // generate the fresh token by the cookie token
 const handleRefereshToken = asyncHandler(async(req, res)=>{
     const cookie = req.cookies; // get the cookie
-    if(!cookie?.referesh_token){
+    if(!cookie?.refresh_token){
         return res.status(500).json({
             status: "failed",
             code: 500,
             error: 'no token found in cookie. Please try again.',
         });  
     }
-    const refereshToken = cookie.referesh_token; // get token from the cookie
-    const user = await User.findOne({'referesh_token':refereshToken}); // find user by token
-    console.log(user);
+    const refereshToken = cookie.refresh_token; // get token from the cookie
+    const user = await User.findOne({'refresh_token':refereshToken}); // find user by token
     if(!user){
         return res.status(500).json({
             status: "failed",
@@ -326,6 +325,45 @@ const handleRefereshToken = asyncHandler(async(req, res)=>{
         });
     });
 });
+// logout the user
+const logout = asyncHandler(async (req, res)=>{
+    const cookie = req.cookies; // get the cookie
+    if(!cookie?.refresh_token){
+        return res.status(500).json({
+            status: "failed",
+            code: 500,
+            error: 'no token found in cookie. Please try again.',
+        });  
+    }
+    const token = cookie.refresh_token; // get token from the cookie
+    const user = await User.findOne({'refresh_token':token}); // find user by token
+    console.log(user);
+    if(!user){
+        return res.status(500).json({
+            status: "failed",
+            code: 500,
+            error: 'no token found in records or not created yet.',
+        });  
+    }
+    // reset the cookie
+    res.clearCookie('refresh_token',{
+        httpOnly:true, // using for http request only for the security reasons 
+        secure:true //the cookie will only be sent over HTTPS connections. This ensures that the cookie is encrypted and protected from interception during transmission.
+    });
+    // reset the value again
+    const updateToken = await User.findOneAndUpdate(
+        { 'refresh_token': token },
+        { 'refresh_token': '' }, // Replace 'NEW_REFRESH_TOKEN_VALUE' with the new token value.
+        { new: true } // The 'new' option returns the updated document.
+      );
+    return res.status(200).json({
+        status: "success",
+        code: 200,
+        message: "User Successfully loged out.",
+    });
+
+
+});
 module.exports = {
     createUser,
     loginUser,
@@ -336,4 +374,5 @@ module.exports = {
     blockUser,
     unblockUser,
     handleRefereshToken,
+    logout,
 };

@@ -1,5 +1,5 @@
 const express = require('express');
-const { create } = require('../models/User');
+
 const { 
     createUser, 
     loginUser, 
@@ -10,6 +10,7 @@ const {
     blockUser, 
     unblockUser,
     handleRefereshToken,
+    logout,
     } = require('../controllers/UserController');
 const {authMiddleware, isAdmin} = require('../middlewares/authMiddleware');
 const router = express.Router();
@@ -17,6 +18,7 @@ const router = express.Router();
 // users
 router.post('/register', createUser);
 router.post('/login', loginUser);
+router.get('/logout', logout);
 router.get('/users', users);
 router.get('/:id', authMiddleware, isAdmin, user);
 router.delete('/:id', deleteUser);
