@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const { generateToken } = require('../config/jwtToken');
 const User = require('../models/User');
 const asyncHandler = require('express-async-handler');
@@ -70,7 +71,7 @@ const loginUser = asyncHandler( async (req, res) => {
                         'mobile':findUser?.mobile,
                         'firstname':findUser?.first_name,
                         'lastname':findUser?.last_name,
-                        'token': generateToken(findUser?._id)
+                        'token': newToken
                     }
                 });
             }
@@ -89,9 +90,7 @@ const loginUser = asyncHandler( async (req, res) => {
         throw Error(error);
     }    
 });
-
 // to get the all users listing
-
 const users = asyncHandler( async (req, res) => {
     try{
         let users = await User.find();
@@ -256,7 +255,6 @@ const blockUser = asyncHandler(async (req, res) => {
         error: 'User Not found' 
     });
 });
-
 // ublock the user
 const unblockUser = asyncHandler(async (req, res)=>{
     const {id} = req.user;
@@ -292,6 +290,42 @@ const unblockUser = asyncHandler(async (req, res)=>{
     });
 
 });
+// generate the fresh token by the cookie token
+const handleRefereshToken = asyncHandler(async(req, res)=>{
+    const cookie = req.cookies; // get the cookie
+    if(!cookie?.referesh_token){
+        return res.status(500).json({
+            status: "failed",
+            code: 500,
+            error: 'no token found in cookie. Please try again.',
+        });  
+    }
+    const refereshToken = cookie.referesh_token; // get token from the cookie
+    const user = await User.findOne({'referesh_token':refereshToken}); // find user by token
+    console.log(user);
+    if(!user){
+        return res.status(500).json({
+            status: "failed",
+            code: 500,
+            error: 'no token found in records or not created yet.',
+        });  
+    }
+    jwt.verify(refereshToken, process.env.JWT_SECRET, (err, decoded) => {// verify the token 
+        if(err || user.id !== decoded.id){
+            return res.status(500).json({
+                status: "failed",
+                code: 500,
+                error: 'something went wrong with referesh token.',
+            });  
+        }
+        const newToken =  generateToken(user.id);
+        return res.status(201).json({
+            status: "success",
+            code: 201,
+            new_token: newToken,
+        });
+    });
+});
 module.exports = {
     createUser,
     loginUser,
@@ -301,4 +335,5 @@ module.exports = {
     updateUser,
     blockUser,
     unblockUser,
+    handleRefereshToken,
 };
