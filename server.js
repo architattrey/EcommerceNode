@@ -3,6 +3,7 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const dbConnect = require('./config/db');
 const authRouter = require('./routes/authRoute');
+const productRouter = require('./routes/productRoute');
 const cookieParser = require('cookie-parser');
 const socketIO = require('socket.io');
 const {notFound, errorHandler} = require('./middlewares/errorHandler');
@@ -21,6 +22,7 @@ app.listen(PORT, ()=>{
 });
 
 app.use('/api/user', authRouter);
+app.use('/api/product', productRouter);
 app.use(notFound);
 app.use(errorHandler);
 
