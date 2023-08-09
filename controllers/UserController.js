@@ -337,7 +337,6 @@ const logout = asyncHandler(async (req, res)=>{
     }
     const token = cookie.refresh_token; // get token from the cookie
     const user = await User.findOne({'refresh_token':token}); // find user by token
-    console.log(user);
     if(!user){
         return res.status(500).json({
             status: "failed",
