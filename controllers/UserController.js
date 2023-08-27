@@ -18,26 +18,26 @@ const createUser = asyncHandler( async (req, res) => {
             // check the user that existing or not
             if(!findUser){
                 const createNewUser = await User.create(req.body); // user created in this query
-                res.json({
+                return res.json({
                     data:createNewUser,
                     message:"User Created Successfully.",
                     status:'success',
                     code:200
                 });
-            }else{
-                res.json({
-                    message:"User Already Exist",
-                    status:'failed',
-                    code:200
-                });
             }
-        }else{
-            res.json({
-                message:"Please provide the email id",
+            return res.json({
+                message:"User Already Exist",
                 status:'failed',
                 code:200
             });
-        }     
+            
+        }
+        return res.json({
+            message:"Please provide the email id",
+            status:'failed',
+            code:200
+        });
+        
     }catch(error){
         throw Error(error);
     }
@@ -62,7 +62,7 @@ const loginUser = asyncHandler( async (req, res) => {
                     httpOnly: true,
                     maxAge: 72 * 60 * 60 * 1000,
                 });
-                res.status(200).json({
+                return res.status(200).json({
                     status:'success', 
                     code:"200", 
                     data: {
@@ -75,13 +75,13 @@ const loginUser = asyncHandler( async (req, res) => {
                     }
                 });
             }
-            res.status(401).json({ 
+            return res.status(401).json({ 
                 status: "failed", 
                 code:"401",
                 error: 'Invalid credentials' 
             }); 
         }
-        res.status(404).json({ 
+        return res.status(404).json({ 
             status: "failed", 
             code:"404", 
             error: 'User Not found' 
@@ -95,13 +95,13 @@ const users = asyncHandler( async (req, res) => {
     try{
         let users = await User.find();
         if(users){
-            res.status(200).json({
+            return res.status(200).json({
                 status:"success",
                 code:200,
                 data:users
             });  
         }
-        res.status(404).json({ 
+        return res.status(404).json({ 
             status: "failed", 
             code:"404", 
             error: 'Users Not found' 
@@ -118,19 +118,19 @@ const user = asyncHandler( async(req, res) => {
             validateMongodbId(id);
             const user = await User.findById(id);
             if(user){
-                res.status(200).json({
+                return res.status(200).json({
                     status:"success",
                     code:200,
                     data:user
                 }); 
             }
-            res.status(404).json({ 
+            return res.status(404).json({ 
                 status: "failed", 
                 code:"404", 
                 error: 'User Not found' 
             });  
         }
-        res.status(400).json({ 
+        return res.status(400).json({ 
             status: "failed", 
             code:"400", 
             error: 'Bad Perameters.' 
